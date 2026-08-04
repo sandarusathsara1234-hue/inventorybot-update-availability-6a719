@@ -1,0 +1,16 @@
+{
+  "actionId": "6a719989a284aeb9db4f60ed",
+  "structure": {
+    "name": "Update online availability",
+    "actionName": "Update online availability",
+    "actionIndex": 1,
+    "baseUrl": "",
+    "screenshotEnabled": false,
+    "parameters": {
+      "execute": []
+    },
+    "groups": [],
+    "steps": []
+  },
+  "commitMessage": "Initial register auth sidecar"
+}

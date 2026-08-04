@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "persona_slash_command",
+  "pageId": "f9db9227-bce2-489c-bb67-51702ac47d95",
+  "commandId": "cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+  "operatorActionId": "6a719989a284aeb9db4f60ed",
+  "commandTrigger": "update-availability",
+  "commandLabel": "Update online availability",
+  "commandDescription": "Update online availability and propose substitutions for out-of-stock grocery items.",
+  "personaRepository": {
+    "remoteUrl": "https://github.com/sandarusathsara1234-hue/persona-inventorybot.git",
+    "defaultBranch": "main",
+    "configPath": "assets/chat-config.json",
+    "owns": [
+      "command trigger",
+      "label and description",
+      "enabled state",
+      "presentation",
+      "Operator action reference"
+    ]
+  },
+  "workflowRepository": {
+    "remoteUrl": "https://github.com/sandarusathsara1234-hue/inventorybot-update-availability-6a719.git",
+    "defaultBranch": "main",
+    "workflowPath": "assets/workflow.json",
+    "owns": [
+      "executable workflow steps",
+      "prompts and runtime configuration",
+      "inputs and outputs",
+      "generated child skills"
+    ]
+  }
+}
