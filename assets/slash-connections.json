@@ -3,15 +3,208 @@
   "commandId": "cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
   "trigger": "update-availability",
   "label": "Update online availability",
-  "updatedAt": 1786012381866,
+  "updatedAt": 1786012401273,
   "nodes": [
     {
       "id": "slash:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
       "kind": "slash",
-      "label": "Update online availability",
-      "description": "Update online availability and propose substitutions for out-of-stock grocery items."
+      "label": "/update-availability",
+      "description": "Update online availability and propose substitutions for out-of-stock grocery items.",
+      "meta": {
+        "commandId": "cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+        "trigger": "update-availability"
+      }
+    },
+    {
+      "id": "execution:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+      "kind": "execution",
+      "label": "Operator action",
+      "description": "Repository-backed Operator workflow",
+      "meta": {
+        "executionType": "operator_action",
+        "automationId": "e0e785d6-f2c7-493b-a5ab-ca01d25c4597",
+        "actionId": "6a7462a314946ed29f0d723d"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a1b2c",
+      "kind": "workflow_step",
+      "label": "Browserless workflow start",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "navigate",
+        "stepNumber": 1,
+        "stepId": "step-a1b2c",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b3d4e",
+      "kind": "workflow_step",
+      "label": "Read Gabriel inventory list (OOS detection)",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "mcp_tool",
+        "stepNumber": 2,
+        "stepId": "step-b3d4e",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c5f6a",
+      "kind": "workflow_step",
+      "label": "Read Gabriel substitutes list (rank)",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "mcp_tool",
+        "stepNumber": 3,
+        "stepId": "step-c5f6a",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-d7e8f",
+      "kind": "workflow_step",
+      "label": "HARD GATE: Review OOS items and substitutes before external writes",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "confirmation",
+        "stepNumber": 4,
+        "stepId": "step-d7e8f",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-e9a0b",
+      "kind": "workflow_step",
+      "label": "Square: read_inventory / verify (Phase B)",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "mcp_tool",
+        "stepNumber": 5,
+        "stepId": "step-e9a0b",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-f1c2d",
+      "kind": "workflow_step",
+      "label": "Shopify: STAGE availability updates for OOS (Phase B)",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "mcp_tool",
+        "stepNumber": 6,
+        "stepId": "step-f1c2d",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a7b8c",
+      "kind": "workflow_step",
+      "label": "Sheets: rank_substitutes / sync rules (Phase B)",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "mcp_tool",
+        "stepNumber": 7,
+        "stepId": "step-a7b8c",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b8c9d",
+      "kind": "workflow_step",
+      "label": "Second confirmation: Publish Shopify availability updates?",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "confirmation",
+        "stepNumber": 8,
+        "stepId": "step-b8c9d",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
+    },
+    {
+      "id": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c9d0e",
+      "kind": "workflow_step",
+      "label": "Structured final result output",
+      "description": "Operator workflow step",
+      "meta": {
+        "actionType": "api_output",
+        "stepNumber": 9,
+        "stepId": "step-c9d0e",
+        "actionId": "6a7462a314946ed29f0d723d",
+        "repositoryHead": "cdf7d61e2cfdabe30a53efecc0593cf073b06ec5"
+      }
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "id": "edge:slash:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:executes:execution:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:1",
+      "source": "slash:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+      "target": "execution:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+      "relation": "executes"
+    },
+    {
+      "id": "edge:execution:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a1b2c:2",
+      "source": "execution:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a1b2c",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a1b2c:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b3d4e:3",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a1b2c",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b3d4e",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b3d4e:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c5f6a:4",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b3d4e",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c5f6a",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c5f6a:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-d7e8f:5",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c5f6a",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-d7e8f",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-d7e8f:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-e9a0b:6",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-d7e8f",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-e9a0b",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-e9a0b:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-f1c2d:7",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-e9a0b",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-f1c2d",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-f1c2d:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a7b8c:8",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-f1c2d",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a7b8c",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a7b8c:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b8c9d:9",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-a7b8c",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b8c9d",
+      "relation": "continues"
+    },
+    {
+      "id": "edge:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b8c9d:continues:operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c9d0e:10",
+      "source": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-b8c9d",
+      "target": "operator-step:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7:step-c9d0e",
+      "relation": "continues"
+    }
+  ],
   "relatedTodoIds": []
 }
