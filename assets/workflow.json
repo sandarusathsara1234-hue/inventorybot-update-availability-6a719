@@ -16,7 +16,7 @@
         "stepId": "step-a1b2c",
         "action_type": "navigate",
         "label": "Browserless workflow start",
-        "intent": "**Input:** No input variables — uses the persona command invocation context.\n\n**Processing:** Initializes the Operator workflow context in browserless mode (no browser launch). All subsequent steps are API/integration-only.\n\n**Output:** No exported variables. The step succeeds when the workflow context is ready.",
+        "intent": "**Input:** No input variables — uses the persona command invocation context and Phase A simulation outcomes.\n\n**Processing:** Initializes the Operator workflow context in browserless mode (no browser launch). All subsequent steps are API/integration-only.\n\n**Output:** No exported variables. The step succeeds when the workflow context is ready.",
         "url": "",
         "disableBrowser": true,
         "selectors": [],
@@ -26,14 +26,14 @@
         "step_number": 2,
         "stepId": "step-b3d4e",
         "action_type": "mcp_tool",
-        "label": "Square: Read inventory counts",
-        "intent": "**Input:** No input variables — uses the SQUARE_LOCATION_ID environment placeholder and INVENTORY_THRESHOLD.\n\n**Processing:** Calls the Square Composio toolkit (mcpServerId: SQUARE) to fetch current inventory counts for the configured store location. Returns all items with their quantities and flags items at or below the threshold as out_of_stock.\n\n**Output:** Exports `inventoryItems` — a JSON array of all items with fields: sku, name, quantity, location, out_of_stock (boolean). Exports `outOfStockItems` — filtered array of items where out_of_stock is true. Consumed by steps 3, 4, and 5.",
-        "mcpServerId": "SQUARE",
-        "systemPrompt": "You are a grocery inventory operations agent. Your job is to fetch current inventory counts from Square and identify items that are out of stock or below threshold.",
-        "userPrompt": "Fetch current inventory for store location {{SQUARE_LOCATION_ID}}. Return a JSON array of items with fields: sku, name, quantity, location. Flag any item with quantity <= {{INVENTORY_THRESHOLD}} as out_of_stock. Include all items in the response, with an out_of_stock boolean field for each.",
+        "label": "Read Gabriel inventory list (OOS detection)",
+        "intent": "**Input:** No input variables — reads from Gabriel list 'InventoryBot Store Inventory' via the persona's Gabriel-native data access.\n\n**Processing:** Reads the Gabriel inventory list to detect out-of-stock items (qty_on_hand <= 0, status = oos). Formats the OOS list for downstream confirmation and external execution.\n\n**Output:** Exports `oosList` — a JSON array of out-of-stock items with fields: sku, item_name, qty_on_hand, online_available, status. Exports `allInventory` — full inventory array. Consumed by steps 3, 4, 5, 6, and 9.",
+        "mcpServerId": "",
+        "systemPrompt": "You are a grocery inventory operations agent. Read the Gabriel list 'InventoryBot Store Inventory' and identify all items where qty_on_hand <= 0 or status = 'oos'. Return the full out-of-stock list and the complete inventory.",
+        "userPrompt": "Read the Gabriel list 'InventoryBot Store Inventory'. Identify all items where qty_on_hand <= 0 or status = 'oos'. Return a JSON object with two fields: oosList (array of OOS items with sku, item_name, qty_on_hand, online_available, status) and allInventory (full inventory array). This data comes from Gabriel Lists, not external apps.",
         "exportedVariables": {
-          "inventoryItems": "response",
-          "outOfStockItems": "response"
+          "oosList": "response.oosList",
+          "allInventory": "response.allInventory"
         },
         "timestamp": 1710000001000
       },
@@ -41,27 +41,26 @@
         "step_number": 3,
         "stepId": "step-c5f6a",
         "action_type": "mcp_tool",
-        "label": "Derive out-of-stock list from Square output",
-        "intent": "**Input:** `{{step-b3d4e.inventoryItems}}` is the full inventory array from step 2 (Square: Read inventory counts), which includes an out_of_stock boolean per item.\n\n**Processing:** Filters the inventory data to extract only items where out_of_stock is true, formatting them into a clean OOS list for downstream Shopify and Sheets steps.\n\n**Output:** Exports `oosList` — a JSON array of out-of-stock items with fields: sku, name, currentQuantity, location. Consumed by steps 4 (Shopify stage), 5 (Google Sheets substitutes), 6 (confirmation), and 8 (api_output).",
-        "mcpServerId": "SQUARE",
-        "systemPrompt": "You are a data processing agent. Extract and format the out-of-stock items from the inventory data.",
-        "userPrompt": "From the inventory data in {{step-b3d4e.inventoryItems}}, extract only items where out_of_stock is true. Return a JSON array with fields: sku, name, currentQuantity, location. This is the OOS list that will be used for Shopify availability updates and substitution matching.",
+        "label": "Read Gabriel substitutes list (rank)",
+        "intent": "**Input:** `{{step-b3d4e.oosList}}` is the OOS items array from step 2. Reads from Gabriel list 'InventoryBot Substitutes'.\n\n**Processing:** Reads the Gabriel substitutes list and matches substitution rows to OOS SKUs. Ranks substitutes by priority (lower number = higher rank).\n\n**Output:** Exports `substitutions` — a JSON array with fields: oosSku, oosName, substitutes (array of {substituteSku, substituteName, priority, notes}). Consumed by steps 4, 5, 6, and 9.",
+        "mcpServerId": "",
+        "systemPrompt": "You are a grocery substitution recommendation agent. Read the Gabriel list 'InventoryBot Substitutes' and rank substitute products for each out-of-stock item.",
+        "userPrompt": "Read the Gabriel list 'InventoryBot Substitutes'. For each OOS item in {{step-b3d4e.oosList}}, find matching substitution rows by sku. Rank substitutes by priority (lower number = higher rank). Return a JSON array with fields: oosSku, oosName, substitutes (array of {substituteSku, substituteName, priority, notes}). This data comes from Gabriel Lists, not external apps.",
         "exportedVariables": {
-          "oosList": "response"
+          "substitutions": "response"
         },
         "timestamp": 1710000002000
       },
       {
         "step_number": 4,
         "stepId": "step-d7e8f",
-        "action_type": "mcp_tool",
-        "label": "Shopify: Stage availability updates (draft, not published)",
-        "intent": "**Input:** `{{step-c5f6a.oosList}}` is the OOS items array from step 3 (Derive OOS list). SHOPIFY_STORE_DOMAIN is an environment placeholder.\n\n**Processing:** Calls the Shopify Composio toolkit (mcpServerId: SHOPIFY) to create staged/draft availability updates for each out-of-stock item. Sets online availability to unavailable/out_of_stock. Does NOT publish these changes live — they remain as draft for human review.\n\n**Output:** Exports `stagedAvailabilityChanges` — a JSON array of staged changes with fields: sku, productId, productName, previousStatus, newStatus, stagedStatus (draft). Consumed by steps 6 (confirmation), 7 (publish), and 8 (api_output).",
-        "mcpServerId": "SHOPIFY",
-        "systemPrompt": "You are a Shopify catalog management agent. Your job is to STAGE availability updates for out-of-stock items. Do NOT publish these changes live. Create draft/unpublished updates that can be reviewed and published only after human approval.",
-        "userPrompt": "For each out-of-stock item in {{step-c5f6a.oosList}}, create a staged availability update in Shopify for store {{SHOPIFY_STORE_DOMAIN}}. Set each product's online availability to 'out_of_stock' or 'unavailable' as appropriate. Mark these as draft/staged — do NOT publish them live. Return a JSON array of staged changes with fields: sku, productId, productName, previousStatus, newStatus, stagedStatus (should be 'draft').",
-        "exportedVariables": {
-          "stagedAvailabilityChanges": "response"
+        "action_type": "confirmation",
+        "label": "HARD GATE: Review OOS items and substitutes before external writes",
+        "intent": "**Input:** `{{step-b3d4e.oosList}}` is the OOS items from step 2. `{{step-c5f6a.substitutions}}` is the ranked substitutes from step 3.\n\n**Processing:** Pauses the workflow and presents a summary of out-of-stock items and ranked substitute recommendations. The user must approve or cancel before ANY external Square/Shopify/Sheets writes. Cancel = no external apps are touched.\n\n**Output:** Exports `confirmed` — boolean (true if approved, false if cancelled). Exports `answer` — the user's answer text. Consumed by steps 5, 6, 7, 8, and 9.",
+        "userPrompt": "Please review the following before proceeding to external app execution:\n\n1. Out-of-Stock Items (from Gabriel inventory list): {{step-b3d4e.oosList}}\n\n2. Ranked Substitute Recommendations (from Gabriel substitutes list): {{step-c5f6a.substitutions}}\n\nDo you approve proceeding to Square/Shopify/Sheets execution? Cancel = no external apps will be touched.",
+        "confirmationConfig": {
+          "answerMode": "yes_no",
+          "postAnswer": "continue"
         },
         "timestamp": 1710000003000
       },
@@ -69,26 +68,27 @@
         "step_number": 5,
         "stepId": "step-e9a0b",
         "action_type": "mcp_tool",
-        "label": "Google Sheets: Read substitution rules and rank substitutes",
-        "intent": "**Input:** `{{step-c5f6a.oosList}}` is the OOS items array from step 3 (Derive OOS list). GOOGLE_SHEET_ID is an environment placeholder.\n\n**Processing:** Calls the GOOGLESHEETS Composio toolkit to read the substitution rules tab. For each OOS item, finds matching substitution rows by SKU and ranks them by priority (lower number = higher rank).\n\n**Output:** Exports `substitutions` — a JSON array with fields: oosSku, oosName, substitutes (array of {substituteSku, substituteName, priority, notes}). Consumed by steps 6 (confirmation) and 8 (api_output).",
-        "mcpServerId": "GOOGLESHEETS",
-        "systemPrompt": "You are a grocery substitution recommendation agent. Read substitution rules from a Google Sheet and rank substitute products for each out-of-stock item.",
-        "userPrompt": "Read the substitution rules from Google Sheet ID {{GOOGLE_SHEET_ID}}, tab named 'substitutes'. The sheet has columns: sku, name, substitute_sku, substitute_name, priority, notes. For each OOS item in {{step-c5f6a.oosList}}, find matching substitution rows by sku. Rank substitutes by priority (lower number = higher rank). Return a JSON array with fields: oosSku, oosName, substitutes (array of {substituteSku, substituteName, priority, notes}).",
+        "label": "Square: read_inventory / verify (Phase B)",
+        "intent": "**Input:** `{{step-d7e8f.confirmed}}` is the boolean approval from step 4. `{{step-b3d4e.oosList}}` is the OOS items from step 2.\n\n**Processing:** Only executes if confirmed (true). Calls the Square Composio toolkit to verify inventory counts match the Gabriel list simulation. If not confirmed, skips entirely.\n\n**Output:** Exports `squareVerification` — a JSON object with fields: verified (boolean), discrepancies (array), message. Consumed by steps 6 and 9.",
+        "mcpServerId": "SQUARE",
+        "systemPrompt": "You are a grocery inventory verification agent. Verify Square inventory counts match the provided OOS list from Gabriel. Only run if the user has confirmed approval.",
+        "userPrompt": "Check approval status from {{step-d7e8f.confirmed}}. If approved (true), verify Square inventory for the OOS items in {{step-b3d4e.oosList}}. Return a JSON object with fields: verified (boolean), discrepancies (array of any mismatches), message. If NOT approved (false), return {verified: false, discrepancies: [], message: 'Skipped - not approved'}.",
         "exportedVariables": {
-          "substitutions": "response"
+          "squareVerification": "response"
         },
         "timestamp": 1710000004000
       },
       {
         "step_number": 6,
         "stepId": "step-f1c2d",
-        "action_type": "confirmation",
-        "label": "Human approval: Review staged changes and substitutes",
-        "intent": "**Input:** `{{step-c5f6a.oosList}}` is the OOS items from step 3. `{{step-d7e8f.stagedAvailabilityChanges}}` is the draft Shopify changes from step 4. `{{step-e9a0b.substitutions}}` is the ranked substitutes from step 5.\n\n**Processing:** Pauses the workflow and presents a summary of out-of-stock items, staged Shopify availability changes (draft, not yet published), and ranked substitute recommendations. The user must approve or cancel before any live Shopify changes are applied.\n\n**Output:** Exports `confirmed` — boolean (true if approved, false if cancelled). Exports `answer` — the user's answer text. Consumed by step 7 (publish only if confirmed) and step 8 (api_output).",
-        "userPrompt": "Please review the following before publishing:\n\n1. Out-of-Stock Items: {{step-c5f6a.oosList}}\n\n2. Staged Shopify Availability Changes (draft, not yet published): {{step-d7e8f.stagedAvailabilityChanges}}\n\n3. Ranked Substitute Recommendations: {{step-e9a0b.substitutions}}\n\nDo you approve publishing these availability updates to Shopify?",
-        "confirmationConfig": {
-          "answerMode": "yes_no",
-          "postAnswer": "continue"
+        "action_type": "mcp_tool",
+        "label": "Shopify: STAGE availability updates for OOS (Phase B)",
+        "intent": "**Input:** `{{step-d7e8f.confirmed}}` is the boolean approval from step 4. `{{step-b3d4e.oosList}}` is the OOS items from step 2.\n\n**Processing:** Only executes if confirmed (true). Calls the Shopify Composio toolkit to STAGE availability updates for OOS items. Sets online availability to out_of_stock. Does NOT publish live — remains as draft for second confirmation.\n\n**Output:** Exports `stagedAvailabilityChanges` — a JSON array of staged changes with fields: sku, productId, productName, previousStatus, newStatus, stagedStatus (draft). Consumed by steps 7, 8, and 9.",
+        "mcpServerId": "SHOPIFY",
+        "systemPrompt": "You are a Shopify catalog management agent. STAGE availability updates for out-of-stock items. Do NOT publish these changes live. Create draft/unpublished updates that can be reviewed and published only after a second human approval.",
+        "userPrompt": "Check approval status from {{step-d7e8f.confirmed}}. If approved (true), create staged/draft availability updates in Shopify for each OOS item in {{step-b3d4e.oosList}}. Set each product's online availability to 'out_of_stock'. Mark these as draft/staged — do NOT publish them live. Return a JSON array of staged changes with fields: sku, productId, productName, previousStatus, newStatus, stagedStatus (should be 'draft'). If NOT approved (false), return an empty array.",
+        "exportedVariables": {
+          "stagedAvailabilityChanges": "response"
         },
         "timestamp": 1710000005000
       },
@@ -96,48 +96,76 @@
         "step_number": 7,
         "stepId": "step-a7b8c",
         "action_type": "mcp_tool",
-        "label": "Shopify: Publish availability updates ONLY if approved",
-        "intent": "**Input:** `{{step-f1c2d.confirmed}}` is the boolean approval from step 6 (confirmation). `{{step-d7e8f.stagedAvailabilityChanges}}` is the draft changes from step 4. SHOPIFY_STORE_DOMAIN is an environment placeholder.\n\n**Processing:** Checks the approval status. If confirmed (true), publishes the staged availability changes to Shopify, setting each product's availability status live. If NOT confirmed (false), skips publishing entirely and returns a skipped status.\n\n**Output:** Exports `publishResult` — a JSON object with fields: published (boolean), publishedCount, skipped (boolean), message. Consumed by step 8 (api_output).",
-        "mcpServerId": "SHOPIFY",
-        "systemPrompt": "You are a Shopify catalog publishing agent. Only publish staged availability updates if the human has explicitly approved. If not approved, skip publishing entirely.",
-        "userPrompt": "Check the approval status from {{step-f1c2d.confirmed}}. If approved (true), publish the staged availability changes from {{step-d7e8f.stagedAvailabilityChanges}} to Shopify store {{SHOPIFY_STORE_DOMAIN}}. Set each product's availability status live. If NOT approved (false), do nothing and return an empty result with a 'skipped' status. Return a JSON object with fields: published (boolean), publishedCount, skipped (boolean), message.",
+        "label": "Sheets: rank_substitutes / sync rules (Phase B)",
+        "intent": "**Input:** `{{step-d7e8f.confirmed}}` is the boolean approval from step 4. `{{step-b3d4e.oosList}}` is the OOS items from step 2. `{{step-c5f6a.substitutions}}` is the ranked substitutes from step 3.\n\n**Processing:** Only executes if confirmed (true). Calls the GOOGLESHEETS Composio toolkit to sync substitution rules from Google Sheets, matching the Gabriel substitutes list. If not confirmed, skips entirely.\n\n**Output:** Exports `sheetsSyncResult` — a JSON object with fields: synced (boolean), syncedCount, message. Consumed by steps 8 and 9.",
+        "mcpServerId": "GOOGLESHEETS",
+        "systemPrompt": "You are a grocery substitution sync agent. Sync substitution rules from Google Sheets to match the Gabriel substitutes list. Only run if the user has confirmed approval.",
+        "userPrompt": "Check approval status from {{step-d7e8f.confirmed}}. If approved (true), read the substitution rules from Google Sheets and verify they match the Gabriel substitutes in {{step-c5f6a.substitutions}}. Sync any missing or updated rules. Return a JSON object with fields: synced (boolean), syncedCount (number), message. If NOT approved (false), return {synced: false, syncedCount: 0, message: 'Skipped - not approved'}.",
         "exportedVariables": {
-          "publishResult": "response"
+          "sheetsSyncResult": "response"
         },
         "timestamp": 1710000006000
       },
       {
         "step_number": 8,
-        "stepId": "step-b9c0d",
+        "stepId": "step-b8c9d",
+        "action_type": "confirmation",
+        "label": "Second confirmation: Publish Shopify availability updates?",
+        "intent": "**Input:** `{{step-d7e8f.confirmed}}` is the first approval from step 4. `{{step-f1c2d.stagedAvailabilityChanges}}` is the staged Shopify changes from step 6.\n\n**Processing:** Only presents if first confirmation was approved. Pauses the workflow and presents the staged Shopify availability changes for final publish approval. The user must approve or cancel before Shopify changes go live. Cancel = staged changes remain as draft, no live publish.\n\n**Output:** Exports `publishApproved` — boolean (true if approved for publish, false if cancelled). Exports `publishAnswer` — the user's answer text. Consumed by step 9.",
+        "userPrompt": "The following Shopify availability updates have been STAGED (draft, not yet published):\n\n{{step-f1c2d.stagedAvailabilityChanges}}\n\nDo you approve publishing these updates live to Shopify? Cancel = staged changes remain as draft, no live publish.",
+        "confirmationConfig": {
+          "answerMode": "yes_no",
+          "postAnswer": "continue"
+        },
+        "timestamp": 1710000007000
+      },
+      {
+        "step_number": 9,
+        "stepId": "step-c9d0e",
         "action_type": "api_output",
         "label": "Structured final result output",
-        "intent": "**Input:** `{{step-c5f6a.oosList}}` from step 3, `{{step-d7e8f.stagedAvailabilityChanges}}` from step 4, `{{step-e9a0b.substitutions}}` from step 5, `{{step-f1c2d.confirmed}}` from step 6, `{{step-a7b8c.publishResult}}` from step 7.\n\n**Processing:** Assembles all results into a structured JSON output with fields for OOS items, staged changes, substitutions, approval status, publish result, and a human-readable summary.\n\n**Output:** Returns a structured JSON object consumed by the calling supervisor or API consumer as the final workflow result.",
+        "intent": "**Input:** `{{step-b3d4e.oosList}}` from step 2, `{{step-c5f6a.substitutions}}` from step 3, `{{step-d7e8f.confirmed}}` from step 4, `{{step-e9a0b.squareVerification}}` from step 5, `{{step-f1c2d.stagedAvailabilityChanges}}` from step 6, `{{step-a7b8c.sheetsSyncResult}}` from step 7, `{{step-b8c9d.publishApproved}}` from step 8.\n\n**Processing:** Assembles all results into a structured JSON output with fields for OOS items, substitutions, approval status, verification, staged changes, sheets sync, publish approval, phase, and a human-readable summary.\n\n**Output:** Returns a structured JSON object consumed by the calling supervisor or API consumer as the final workflow result.",
         "outputName": "groceryAvailabilityResult",
         "outputFields": [
           {
             "key": "outOfStockItems",
-            "value": "{{step-c5f6a.oosList}}",
-            "type": "array"
-          },
-          {
-            "key": "stagedAvailabilityChanges",
-            "value": "{{step-d7e8f.stagedAvailabilityChanges}}",
+            "value": "{{step-b3d4e.oosList}}",
             "type": "array"
           },
           {
             "key": "substitutions",
-            "value": "{{step-e9a0b.substitutions}}",
+            "value": "{{step-c5f6a.substitutions}}",
             "type": "array"
           },
           {
             "key": "approvalStatus",
-            "value": "{{step-f1c2d.confirmed}}",
+            "value": "{{step-d7e8f.confirmed}}",
             "type": "string"
           },
           {
-            "key": "publishResult",
-            "value": "{{step-a7b8c.publishResult}}",
+            "key": "squareVerification",
+            "value": "{{step-e9a0b.squareVerification}}",
             "type": "object"
+          },
+          {
+            "key": "stagedAvailabilityChanges",
+            "value": "{{step-f1c2d.stagedAvailabilityChanges}}",
+            "type": "array"
+          },
+          {
+            "key": "sheetsSyncResult",
+            "value": "{{step-a7b8c.sheetsSyncResult}}",
+            "type": "object"
+          },
+          {
+            "key": "publishApproved",
+            "value": "{{step-b8c9d.publishApproved}}",
+            "type": "string"
+          },
+          {
+            "key": "phase",
+            "value": "B",
+            "type": "string"
           },
           {
             "key": "summary",
@@ -145,9 +173,9 @@
             "type": "string"
           }
         ],
-        "timestamp": 1710000007000
+        "timestamp": 1710000008000
       }
     ]
   },
-  "commitMessage": "Add grocery availability + substitutions workflow (8 steps)"
+  "commitMessage": "Update workflow: Gabriel simulate -> confirm -> Square/Shopify/Sheets execute -> publish gate"
 }
