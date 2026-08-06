@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "commandId": "cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+  "trigger": "update-availability",
+  "label": "Update online availability",
+  "updatedAt": 1786012381866,
+  "nodes": [
+    {
+      "id": "slash:cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
+      "kind": "slash",
+      "label": "Update online availability",
+      "description": "Update online availability and propose substitutions for out-of-stock grocery items."
+    }
+  ],
+  "edges": [],
+  "relatedTodoIds": []
+}

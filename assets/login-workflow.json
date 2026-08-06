@@ -1,16 +1,16 @@
 {
-  "actionId": "6a719989a284aeb9db4f60ed",
+  "actionId": "6a7462a314946ed29f0d723d",
   "structure": {
-    "name": "login authentication",
-    "steps": [],
+    "name": "Update online availability",
+    "actionName": "Update online availability",
+    "actionIndex": 1,
+    "baseUrl": "",
+    "screenshotEnabled": false,
     "parameters": {
       "execute": []
     },
-    "baseUrl": "",
-    "actionIndex": 0,
-    "actionName": "login authentication",
-    "screenshotEnabled": false,
-    "groups": []
+    "groups": [],
+    "steps": []
   },
-  "commitMessage": ""
+  "commitMessage": "Initial login auth sidecar"
 }

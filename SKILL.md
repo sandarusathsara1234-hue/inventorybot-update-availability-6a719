@@ -93,9 +93,20 @@ When this skill is materialized as a git repository for a single automation acti
 If `/assets/persona-command.json` exists, this workflow is the executable half of a persona slash command. Before explaining or changing it:
 
 1. Read `/skills/persona-command/SKILL.md` and `/assets/persona-command.json`.
-2. Inspect both this repository's `/assets/workflow.json` and the parent persona repository's `/assets/chat-config.json`.
-3. First summarize what the connected command currently implements, then ask what the author wants to explain, extend, or modify unless a concrete change was already requested.
-4. Edit the parent chat config for command registration, presentation, enabled state, or Operator linkage. Edit the workflow for executable behavior. Coordinate and validate both when a feature crosses that boundary.
+2. Read this repository's debug/docs assets first:
+   - `/assets/workflow.json` — executable steps
+   - `/assets/slash-connections.json` — slash-command connection debug graph
+   - `/skills/persona-command/SKILL.md` — authoring guidance for this command
+3. Open the parent persona repository only for **registration** fields in `/assets/chat-config.json` (`agentTopology.slashCommands`: id, trigger, label, description, enabled, presentation, Operator action reference).
+4. First summarize what the connected command currently implements, then ask what the author wants to explain, extend, or modify unless a concrete change was already requested.
+5. **Do not** create or edit `assets/slash-connections/` (or any slash-command debug definitions) in the parent persona chat-config repository. Debug/docs for slash commands are owned by this workflow repository and the workflow-builder skill.
+
+#### Ownership split
+
+| Location | Owns |
+|----------|------|
+| Parent `assets/chat-config.json` | Runtime registration only: trigger, label, description, enabled, presentation, Operator action linkage |
+| This workflow repo | Executable workflow, prompts, I/O, generated child skills, **slash-connection debug graph** (`assets/slash-connections.json`), persona-command authoring skill |
 
 ## ⚠️ Critical: Flat step structure — most common mistake
 

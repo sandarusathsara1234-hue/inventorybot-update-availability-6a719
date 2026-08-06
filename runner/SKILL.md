@@ -1,7 +1,6 @@
 ---
 name: update-online-availability-runner
 description: Run the "Update online availability" action through the automation API and poll run status.
-
 ---
 
 # Update online availability Runner
@@ -17,38 +16,7 @@ Run an existing action and return the `runId` so the caller can track progress.
 This action has no required runtime inputs.
 
 ## Start Run
-- Endpoint: `POST https://gabrieloperator.com/api/automation/run/f9db9227-bce2-489c-bb67-51702ac47d95/6a<unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk> - 0.5 = 0.0
-    2.  if 0.0 <= x1 < 1.0:
-    3.     # This is a valid state (x is within [0, 1])
-    - 3.3333333333333335
--  12.0
-- 12.0
-- 12715844
-- 2026-08-04
-- 2026-08-04 15:00:11.255Z
-  [INFO] 🔍 Browser close failed (browser may already be closed): Cannot read properties of null (reading 'close')
-  [2026-08-04T15:00:11.294Z] [INFO] ✅ 📢 [RUN-AUTOMATION] Completion notification created and delivery attempted
-  12715844
-  2026-08-0<unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk><unk>
-
----
-name: update-online-availability-runner
-description: Run the "Update online availability" action through the automation API and poll run status.
-
-# Update online availability Runner
-
-## Goal
-Run an existing action and return the `runId` so the caller can track progress.
-
-## Authentication
-- Use an API token in `Authorization: Bearer <token>`.
-- Recommended scope: `api:access` (legacy: `automation:run` + `automation:read`).
-
-## Required Input Keys
-This action has no required runtime inputs.
-
-## Start Run
-- Endpoint: `POST https://gabrieloperator.com/api/automation/run/f9db9227-bce2-489c-bb67-51702ac47d95/6a719989a284aeb9db4f60ed`
+- Endpoint: `POST https://gabrieloperator.com/api/automation/run/e0e785d6-f2c7-493b-a5ab-ca01d25c4597/6a7462a314946ed29f0d723d`
 - JSON body:
 
 ```json
@@ -107,15 +75,6 @@ The status endpoint returns:
 Resume the run with:
 ```
 POST https://gabrieloperator.com/api/automation/resume/{runId}
-{ "agentId": "f9db9227-bce2-489c-bb67-51702ac47d95", "actionId": "6a719989a284aeb9db4f60ed" }
+{ "agentId": "e0e785d6-f2c7-493b-a5ab-ca01d25c4597", "actionId": "6a7462a314946ed29f0d723d" }
 ```
 
-## Key Learnings
-- The action completes quickly (under 3 seconds) with a single navigation step, indicating a very fast, lightweight execution.
-- Interactive step recovery is disabled; no paused states were encountered, confirming the workflow is fully automated for this run.
-- A browser close error (`Cannot read properties of null`) occurred during cleanup but did not affect overall success, suggesting the cleanup step should guard against null browsers.
-- The `set_api_output` step should include a concise `result` and `summary`; based on this run, a result such as `"success"` and a summary like `"Update online availability completed"` is appropriate.
-- Polling the status endpoint is unnecessary for this run because the process finished instantly; however, the generic polling logic remains required for longer runs.
-
-## Run History
-- Run: 12715844 – Date: 2026-08-04 – Status: completed – Steps: 1 passed, 0 failed – Duration: 2.9 s

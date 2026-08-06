@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "persona_slash_command",
-  "pageId": "f9db9227-bce2-489c-bb67-51702ac47d95",
+  "pageId": "e0e785d6-f2c7-493b-a5ab-ca01d25c4597",
   "commandId": "cmd_17c0b826-7ed0-4f29-b88a-8cad73f484d7",
-  "operatorActionId": "6a719989a284aeb9db4f60ed",
+  "operatorActionId": "6a7462a314946ed29f0d723d",
   "commandTrigger": "update-availability",
   "commandLabel": "Update online availability",
   "commandDescription": "Update online availability and propose substitutions for out-of-stock grocery items.",
@@ -23,11 +23,14 @@
     "remoteUrl": "https://github.com/sandarusathsara1234-hue/inventorybot-update-availability-6a719.git",
     "defaultBranch": "main",
     "workflowPath": "assets/workflow.json",
+    "slashConnectionsPath": "assets/slash-connections.json",
     "owns": [
       "executable workflow steps",
       "prompts and runtime configuration",
       "inputs and outputs",
-      "generated child skills"
+      "generated child skills",
+      "slash connection debug graph",
+      "persona-command authoring skill"
     ]
   }
 }

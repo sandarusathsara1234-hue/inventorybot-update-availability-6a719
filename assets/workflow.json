@@ -1,5 +1,5 @@
 {
-  "actionId": "6a719989a284aeb9db4f60ed",
+  "actionId": "6a7462a314946ed29f0d723d",
   "structure": {
     "name": "Update online availability",
     "actionName": "Update online availability",
@@ -177,5 +177,5 @@
       }
     ]
   },
-  "commitMessage": ""
+  "commitMessage": "Initial migration from database"
 }
